@@ -1,0 +1,85 @@
+
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Administrador - Raíz Campesina</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+    <div class="container mt-5">
+
+        <div class="card shadow-lg border-0">
+
+            <div class="card-header bg-success text-white text-center">
+                <h1>Raíz Campesina</h1>
+                <h5>Módulo Administrativo / Control</h5>
+            </div>
+
+            <div class="card-body">
+                
+                <h3 class="mb-4 text-dark">Gestión del Administrador</h3>
+                <p class="text-muted">Monitorea los usuarios del sistema, audita el comportamiento de la plataforma y genera reportes logísticos globales.</p>
+                
+                <hr>
+
+                <h4 class="mb-4 text-success">Opciones Disponibles</h4>
+
+                <div class="row g-3">
+
+                    <div class="col-md-4">
+                        <div class="card border-dark h-100 shadow-sm">
+                            <div class="card-body text-center d-flex flex-column justify-content-between">
+                                <div>
+                                    <h5 class="card-title fw-bold text-dark">Gestión de Usuarios</h5>
+                                    <p class="card-text text-muted small">Administra las credenciales, accesos y roles de los consumidores, proveedores y transportadores.</p>
+                                </div>
+                                <div class="mt-3">
+                                    <a href="/usuarios" class="btn btn-dark w-100 fw-bold">
+                                        Ir a Usuarios
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card border-info h-100 shadow-sm">
+                            <div class="card-body text-center d-flex flex-column justify-content-between">
+                                <div>
+                                    <h5 class="card-title fw-bold text-info">Reportes</h5>
+                                    <p class="card-text text-muted small">Analiza el inventario agrícola general, los flujos de ventas y la analítica del comercio justo.</p>
+                                </div>
+                                <div class="mt-3">
+                                    <a href="/reportes" class="btn btn-info w-100 fw-bold text-white">
+                                        Ver Reportes
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <hr class="mt-4">
+
+                <div class="text-center">
+                    <a href="/panel" class="btn btn-outline-secondary px-4 fw-bold">
+                        ← Volver al Panel Principal
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

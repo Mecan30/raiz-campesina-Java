@@ -1,0 +1,124 @@
+
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Pedidos - Raíz Campesina</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+    <nav class="navbar navbar-dark bg-success shadow-sm mb-4">
+        <div class="container-fluid px-4">
+            <span class="navbar-brand fw-bold fs-4">Raíz Campesina — Seguimiento de Pedidos</span>
+
+            <a th:with="rol=${session.usuarioLogueado?.rol?.nombreRol}"
+               th:href="${#strings.toLowerCase(rol) == 'consumidor' ? '/consumidor' : 
+                         (#strings.toLowerCase(rol) == 'proveedor' ? '/proveedor' : 
+                         (#strings.toLowerCase(rol) == 'transportador' ? '/transportador' : 
+                         (#strings.toLowerCase(rol) == 'administrador' ? '/admin' : '/panel')))}" 
+               class="btn btn-outline-light btn-sm fw-bold px-3">
+                ← Volver
+            </a>
+        </div>
+    </nav>
+
+    <div class="container-fluid px-4">
+        <div class="row g-4">
+
+            <div class="col-12">
+                <div class="card shadow border-0 p-4">
+                    <h3 class="fw-bold text-dark mb-1">Historial de Pedidos Realizados</h3>
+                    <p class="text-muted small mb-4">Listado general de órdenes de compra y estados de despacho en la plataforma.</p>
+                    
+                    <div th:if="${#lists.isEmpty(listaPedidos)}" class="alert alert-info text-center py-4" role="alert">
+                        No se registran pedidos en el sistema todavía.
+                    </div>
+
+                    <div class="table-responsive" th:if="${!#lists.isEmpty(listaPedidos)}">
+                        <table class="table table-hover align-middle border-light">
+                            <thead class="table-light text-secondary">
+                                <tr>
+                                    <th class="py-3">ID Pedido</th>
+                                    <th class="py-3">Fecha</th>
+
+                                    <th class="py-3">
+                                        <span th:if="${rolUsuario == 'CONSUMIDOR'}">Proveedor</span>
+                                        <span th:if="${rolUsuario != 'CONSUMIDOR'}">Consumidor</span>
+                                    </th>
+                                    <th class="py-3">
+                                        <span th:if="${rolUsuario == 'TRANSPORTADOR'}">Proveedor</span>
+                                        <span th:if="${rolUsuario != 'TRANSPORTADOR'}">Transportador</span>
+                                    </th>
+                                    <th class="py-3" th:if="${rolUsuario == 'ADMINISTRADOR'}">Proveedor</th>
+
+                                    <th class="py-3">Producto</th>
+                                    <th class="py-3 text-center">Cantidad</th>
+
+                                    <th class="py-3" th:if="${rolUsuario != 'TRANSPORTADOR'}">Total</th>
+
+                                    <th class="py-3 text-center" th:if="${rolUsuario != 'TRANSPORTADOR'}">Estado Actual</th>
+
+                                    <th class="py-3 text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="p : ${listaPedidos}">
+                                    <td class="fw-bold text-muted" th:text="'#' + ${p.idPedido}"></td>
+                                    <td class="small text-muted" th:text="${#temporals.format(p.fechaPedido, 'dd/MM/yyyy HH:mm')}"></td>
+
+                                    <td>
+                                        <span th:if="${rolUsuario == 'CONSUMIDOR'}" class="badge bg-light text-dark border px-2 py-1.5 fw-semibold"
+                                              th:text="${p.producto != null && p.producto.usuario != null ? p.producto.usuario.nombre : 'Sin asignar'}"></span>
+                                        <span th:if="${rolUsuario != 'CONSUMIDOR'}" class="badge bg-light text-dark border px-2 py-1.5 fw-semibold"
+                                              th:text="${p.usuario != null ? p.usuario.nombre : 'Anónimo'}"></span>
+                                    </td>
+
+                                    <td>
+                                        <span th:if="${rolUsuario == 'TRANSPORTADOR'}" class="badge bg-light text-dark border px-2 py-1.5 fw-semibold"
+                                              th:text="${p.producto != null && p.producto.usuario != null ? p.producto.usuario.nombre : 'Sin asignar'}"></span>
+                                        <span th:if="${rolUsuario != 'TRANSPORTADOR'}" class="badge bg-light text-dark border px-2 py-1.5 fw-semibold"
+                                              th:text="${p.transportador != null ? p.transportador.nombre : 'No asignado'}"></span>
+                                    </td>
+
+                                    <td th:if="${rolUsuario == 'ADMINISTRADOR'}">
+                                        <span class="badge bg-light text-dark border px-2 py-1.5 fw-semibold"
+                                              th:text="${p.producto != null && p.producto.usuario != null ? p.producto.usuario.nombre : 'Sin asignar'}"></span>
+                                    </td>
+
+                                    <td class="fw-semibold text-success" th:text="${p.producto != null ? p.producto.nombre : 'No disponible'}"></td>
+                                    <td class="text-center font-monospace" th:text="${p.cantidad}"></td>
+
+                                    <td class="fw-bold text-dark" th:if="${rolUsuario != 'TRANSPORTADOR'}" th:text="'$' + ${p.total}"></td>
+
+                                    <td class="text-center" th:if="${rolUsuario != 'TRANSPORTADOR'}">
+                                        <span th:classappend="${#strings.toUpperCase(p.estado) == 'ENTREGADO'} ? 'bg-success' : (${#strings.toUpperCase(p.estado) == 'PENDIENTE' || #strings.toUpperCase(p.estado) == 'EN ALISTAMIENTO'} ? 'bg-warning text-dark' : 'bg-primary')" 
+                                              class="badge px-2 py-1" 
+                                              th:text="${p.estado}">
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <div class="d-flex gap-1 justify-content-center">
+                                            <a th:href="@{/valoraciones/{id}(id=${p.idPedido})}" class="btn btn-outline-warning btn-sm fw-bold" style="font-size: 0.75rem;">⭐ Rating</a>
+                                            <a th:href="@{/mensajes/{id}(id=${p.idPedido})}" class="btn btn-outline-info btn-sm fw-bold" style="font-size: 0.75rem;">💬 Chat</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

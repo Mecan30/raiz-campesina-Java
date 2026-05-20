@@ -1,0 +1,157 @@
+
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raíz Campesina - Chat del Pedido</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .chat-container { max-height: 460px; overflow-y: auto; background-color: #f8f9fa; border-radius: 8px; }
+        .burbuja-chat { max-width: 75%; border-radius: 15px; padding: 10px 14px; margin-bottom: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .burbuja-izquierda { background-color: #ffffff; border: 1px solid #dee2e6; margin-right: auto; border-bottom-left-radius: 2px; }
+        .burbuja-derecha { background-color: #d1e7dd; color: #0f5132; margin-left: auto; border-bottom-right-radius: 2px; }
+    </style>
+</head>
+<body class="bg-light">
+
+    <header class="bg-success text-white py-3 shadow-sm mb-4">
+        <div class="container d-flex justify-content-between align-items-center">
+            <h1 class="h4 m-0 fw-bold">💬 Chat por Pedido</h1>
+            <a th:href="@{/historial}" class="btn btn-outline-light btn-sm fw-bold px-3">
+                ← Volver al Historial
+            </a>
+        </div>
+    </header>
+
+    <main class="container mb-5">
+        <div class="row g-4">
+            
+            <section class="col-lg-7">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                        <h2 class="h5 m-0 fw-bold text-dark">Historial de Conversación</h2>
+                        <span class="badge bg-secondary px-2 py-1 fw-bold" th:text="'Pedido #' + ${idPedido}"></span>
+                    </div>
+                    
+                    <div class="card-body text-center py-5 text-muted" th:if="${destinatarioSeleccionadoId == null}">
+                        <span style="font-size: 2.5rem;">👥</span>
+                        <p class="mt-2 fw-semibold">Ningún chat seleccionado.</p>
+                        <small>Por favor, selecciona una persona en el panel de la derecha para ver el historial de mensajes.</small>
+                    </div>
+
+                    <div class="card-body p-4 chat-container" th:if="${destinatarioSeleccionadoId != null}">
+                        
+                        <div class="text-center text-muted small mb-3 fw-bold" th:if="${#lists.isEmpty(listaMensajes)}">
+                            🍃 No hay mensajes previos con este usuario. ¡Sé el primero en escribir!
+                        </div>
+
+                        <div class="d-flex flex-column" th:if="${!#lists.isEmpty(listaMensajes)}">
+                            <div th:each="m : ${listaMensajes}" class="w-100 d-flex flex-column">
+                                <div class="burbuja-chat" 
+                                     th:classappend="${session.usuarioLogueado != null && m.remitente.idUsuario == session.usuarioLogueado.idUsuario} ? 'burbuja-derecha' : 'burbuja-izquierda'">
+                                    
+                                    <div class="d-flex justify-content-between align-items-center mb-1 border-bottom pb-1 border-light-subtle" style="font-size: 0.72rem;">
+                                        <span class="fw-bold" th:text="${m.remitente.nombre}"></span>
+                                        <span class="text-muted font-monospace" th:text="${#temporals.format(m.fechaMensaje, 'dd/MM HH:mm')} ?: ${m.fechaMensaje}"></span>
+                                    </div>
+                                    
+                                    <p class="mb-1 text-break" style="font-size: 0.88rem;" th:text="${m.contenido}"></p>
+                                    
+                                    <div class="d-flex justify-content-end" th:if="${session.usuarioLogueado != null && m.remitente.idUsuario == session.usuarioLogueado.idUsuario}">
+                                        <a th:href="@{/eliminarMensaje/{id}(id=${m.idMensaje})}" 
+                                           class="text-danger opacity-75 small text-decoration-none fw-bold" style="font-size: 0.7rem;"
+                                           onclick="return confirm('¿Eliminar este mensaje?')">🗑️ Borrar</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="col-lg-5">
+                <div class="card border-0 shadow-sm sticky-top" style="top: 20px;">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h3 class="h5 m-0 fw-bold text-success">¿A quién le vas a escribir?</h3>
+                    </div>
+                    <div class="card-body">
+                        
+                        <div class="d-flex gap-2 mb-4 justify-content-center">
+    
+                            <a th:if="${proveedorPedido != null && session.usuarioLogueado?.idUsuario != proveedorPedido?.idUsuario}"
+                               th:href="@{/mensajes/{id}(id=${idPedido}, destinatarioId=${proveedorPedido.idUsuario})}"
+                               class="btn btn-sm fw-bold px-3 py-2 flex-grow-1"
+                               th:classappend="${destinatarioSeleccionadoId == proveedorPedido?.idUsuario} ? 'btn-success' : 'btn-outline-secondary'">
+                               👨‍🌾 Proveedor: <span th:text="${proveedorPedido?.nombre}"></span>
+                            </a>
+
+                            <a th:if="${transportadorPedido != null && session.usuarioLogueado?.idUsuario != transportadorPedido?.idUsuario}"
+                               th:href="@{/mensajes/{id}(id=${idPedido}, destinatarioId=${transportadorPedido.idUsuario})}"
+                               class="btn btn-sm fw-bold px-3 py-2 flex-grow-1"
+                               th:classappend="${destinatarioSeleccionadoId == transportadorPedido?.idUsuario} ? 'btn-success' : 'btn-outline-secondary'">
+                               🚚 Transportador: <span th:text="${transportadorPedido?.nombre}"></span>
+                            </a>
+
+                            <a th:if="${consumidorPedido != null && session.usuarioLogueado?.idUsuario != consumidorPedido?.idUsuario}"
+                               th:href="@{/mensajes/{id}(id=${idPedido}, destinatarioId=${consumidorPedido.idUsuario})}"
+                               class="btn btn-sm fw-bold px-3 py-2 flex-grow-1"
+                               th:classappend="${destinatarioSeleccionadoId == consumidorPedido?.idUsuario} ? 'btn-success' : 'btn-outline-secondary'">
+                               🛒 Consumidor: <span th:text="${consumidorPedido?.nombre}"></span>
+                            </a>
+                        </div>
+
+                        <div th:if="${destinatarioSeleccionadoId != null}">
+                            
+                            <form th:action="@{/guardarMensaje}" method="post" th:object="${mensaje}" 
+                                    onsubmit="desactivarBotonEnviar(this)">
+
+                                  <input type="hidden" name="pedido.idPedido" th:value="${idPedido}">
+                                  <input type="hidden" name="remitente" th:value="${session.usuarioLogueado.idUsuario}">
+                                  <input type="hidden" name="destinatario" th:value="${destinatarioSeleccionadoId}">
+
+                                  <div class="mb-3">
+                                      <label class="form-label small fw-bold text-secondary">Escribe tu mensaje abajo:</label>
+                                      <textarea th:field="*{contenido}" 
+                                                class="form-control form-control-sm border-secondary" 
+                                                rows="5" 
+                                                placeholder="Escribe los detalles aquí..." 
+                                                required></textarea>
+                                  </div>
+
+                                  <div class="d-grid">
+                                      <button type="submit" id="btnEnviar" class="btn btn-success fw-bold shadow-sm">
+                                          Enviar Mensaje Directo 🚀
+                                      </button>
+                                  </div>
+                            </form>
+                            
+                        </div>
+                        
+                        <div class="text-center text-muted small p-2 bg-light border rounded" th:if="${destinatarioSeleccionadoId == null}">
+                            💡 Selecciona uno de los botones de arriba para abrir el canal de texto.
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+            
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        function desactivarBotonEnviar(formulario) {
+            // Buscamos el botón por su ID
+            const boton = document.getElementById('btnEnviar');
+            if (boton) {
+                // Cambiamos el texto para que el usuario sepa que se está procesando
+                boton.innerHTML = 'Enviando... ⏳';
+                // Deshabilitamos el botón para impedir segundos clics
+                boton.disabled = true;
+            }
+        }
+    </script>
+</body>
+</html>

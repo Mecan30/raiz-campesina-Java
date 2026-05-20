@@ -1,0 +1,172 @@
+
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raíz Campesina</title>
+    
+    <link rel="icon" type="image/png" th:href="@{/images/logo.png(v=1)}">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+</head>
+
+<body>
+
+    <div class="container mt-3">
+        <div th:if="${msg == 'ok'}" class="alert alert-success alert-dismissible fade show" role="alert">
+            ¡Usuario registrado correctamente! Ya puedes iniciar sesión.
+        </div>
+        <div th:if="${msg == 'correoExiste'}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            El correo electrónico ya está registrado.
+        </div>
+        <div th:if="${msg == 'identificacionExiste'}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            El número de identificación ya se encuentra registrado.
+        </div>
+        <div th:if="${msg == 'errorLogin'}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            Correo o contraseña incorrectos. Por favor, verifica.
+        </div>
+    </div>
+
+    <header class="d-flex justify-content-between align-items-center p-3 px-4 bg-success shadow-sm">
+    <div class="logo d-flex align-items-center">
+        <img th:src="@{/images/logo.png}" alt="Logo Raíz Campesina" class="me-2" style="height: 40px; width: auto; filter: brightness(0) invert(1);">
+        <h1 class="m-0 fw-bold text-white" style="font-size: 1.8rem;">Raíz Campesina</h1>
+    </div>
+
+    <form class="login-form" th:action="@{/login}" method="post" style="max-width: 500px;">
+        
+        <div class="row g-2 align-items-center">
+            <div class="col-sm-5">
+                <input type="email" name="correo" class="form-control form-control-sm shadow-effect" placeholder="Correo electrónico" required style="height: 32px;">
+            </div>
+            <div class="col-sm-5">
+                <input type="password" name="clave" class="form-control form-control-sm shadow-effect" placeholder="Contraseña" required style="height: 32px;">
+            </div>
+            <div class="col-sm-2">
+                <button type="submit" class="btn btn-white btn-sm shadow-effect w-100 fw-bold d-flex align-items-center justify-content-center text-success bg-white" style="height: 32px; border: none;">
+                    Entrar
+                </button>
+            </div>
+        </div>
+
+        <div class="row g-2 mt-1">
+            <div class="col-sm-5">
+                <div class="form-check text-start ps-4 m-0">
+                    <input class="form-check-input" type="checkbox" name="recordarme" id="recordarmeCheck" style="cursor: pointer; transform: scale(0.85); margin-top: 0.15rem;">
+                    <label class="form-check-label text-white-50" for="recordarmeCheck" style="font-size: 0.72rem; cursor: pointer; white-space: nowrap;">
+                        Mantener sesión abierta
+                    </label>
+                </div>
+            </div>
+            <div class="col-sm-5 text-end">
+                <a href="#" class="forgot text-white-50 small d-block pe-1" style="text-decoration: none; font-size: 0.72rem; white-space: nowrap;">
+                    ¿Olvidaste la contraseña?
+                </a>
+            </div>
+            <div class="col-sm-2"></div>
+        </div>
+
+    </form>
+</header>
+
+<section class="hero d-flex align-items-center justify-content-center py-5" 
+         th:style="'background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(' + @{/images/fondo.jpg} + ') no-repeat center center / cover; min-height: 85vh;'">
+    
+    <div class="container row align-items-center">
+        
+        <div class="col-md-6 mb-4 mb-md-0 text-center text-md-start text-white" style="text-shadow: 2px 2px 8px rgba(0,0,0,0.7);">
+            <h2 class="display-4 fw-bold">Bienvenido</h2>
+            <p class="lead">Apoya directamente a nuestros productores locales agrícolas comprando productos frescos y de calidad.</p>
+        </div>
+
+        <div class="col-md-6">
+            <form class="registro-form p-4 bg-white rounded shadow-lg border" th:action="@{/registrar}" method="post" th:object="${usuario}">
+                
+                <h2 class="fw-bold text-center text-dark m-0">REGÍSTRATE</h2>
+                <h5 class="text-center text-success small mb-4 fw-normal">Conectando el campo con tu mesa</h5>
+
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <input type="text" th:field="*{nombre}" class="form-control shadow-effect" placeholder="Nombre" required>
+                    </div>
+                    <div class="col-sm-6">
+                        <input type="text" th:field="*{apellido}" class="form-control shadow-effect" placeholder="Apellido" required>
+                    </div>
+
+                    <div class="col-12">
+                        <input type="text" th:field="*{numeroIdentificacion}" class="form-control shadow-effect" placeholder="Identificación (C.C / NIT)" required>
+                    </div>
+
+                    <div class="col-12">
+                        <input type="email" th:field="*{correo}" class="form-control shadow-effect" placeholder="Correo electrónico" required>
+                    </div>
+
+                    <div class="col-12">
+                        <input type="password" th:field="*{clave}" class="form-control shadow-effect" placeholder="Contraseña segura" required>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <input type="text" th:field="*{telefono}" class="form-control shadow-effect" placeholder="Teléfono / Celular">
+                    </div>
+                    <div class="col-sm-6">
+                        <input type="text" th:field="*{departamento}" class="form-control shadow-effect" placeholder="Departamento">
+                    </div>
+
+                    <div class="col-sm-6">
+                        <input type="text" th:field="*{ciudad}" class="form-control shadow-effect" placeholder="Ciudad">
+                    </div>
+                    <div class="col-sm-6">
+                        <input type="text" th:field="*{direccion}" class="form-control shadow-effect" placeholder="Dirección de entrega">
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label class="form-label text-muted small m-0 ps-1">Fecha de nacimiento</label>
+                        <input type="date" th:field="*{fechaNacimiento}" class="form-control shadow-effect">
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label text-muted small m-0 ps-1">Género</label>
+                        <select th:field="*{genero}" class="form-select shadow-effect">
+                            <option value="Masculino">Masculino</option>
+                            <option value="Femenino">Femenino</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-sm-6">
+                        <label class="form-label text-muted small m-0 ps-1">
+                            Rol
+                        </label>
+
+                        <select th:field="*{rol}"
+                                class="form-select shadow-effect"
+                                required>
+
+                            <option value="">
+                                Seleccione un rol
+                            </option>
+
+                            <option th:each="r : ${listaRoles}"
+                                    th:value="${r.idRol}"
+                                    th:text="${r.nombreRol}">
+                            </option>
+
+                        </select>
+                    </div>
+
+                    <div class="col-12 mt-4 text-center">
+                        <button type="submit" class="btn btn-success w-100 shadow-effect py-2 fw-bold">
+                            Registrarse
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</section>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

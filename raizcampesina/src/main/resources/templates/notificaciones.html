@@ -1,0 +1,98 @@
+
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Notificaciones - Raíz Campesina</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+    <div class="container-fluid mt-5 mb-5 px-4">
+
+        <div class="card shadow-lg border-0">
+
+            <div class="card-header bg-success text-white text-center">
+                <h1>Raíz Campesina</h1>
+                <h5 th:if="${rolUsuario == 'ADMINISTRADOR'}">Módulo de Auditoría / Historial Global del Sistema</h5>
+                <h5 th:unless="${rolUsuario == 'ADMINISTRADOR'}">Buzón Automatizado de Alertas y Novedades</h5>
+            </div>
+
+            <div class="card-body p-4">
+                
+                <h3 class="mb-4 text-dark fw-bold" th:text="${rolUsuario == 'ADMINISTRADOR'} ? 'Bitácora Global de Eventos' : 'Mis Alertas Recientes'">Notificaciones</h3>
+                
+                <hr class="mb-4">
+
+                <div th:if="${#lists.isEmpty(listaNotificaciones)}" class="alert alert-info text-center fw-medium mb-4 shadow-sm">
+                    No se registran alertas o novedades en este momento.
+                </div>
+
+                <div class="table-responsive" th:unless="${#lists.isEmpty(listaNotificaciones)}">
+                    <table class="table table-hover table-striped align-middle border text-nowrap">
+                        <thead class="table-dark">
+                            <tr>
+                                <th scope="col" class="px-3">Código</th>
+                                <th scope="col" th:if="${rolUsuario == 'ADMINISTRADOR'}">Usuario Destinatario</th>
+                                <th scope="col">Novedad / Evento Detectado</th>
+                                <th scope="col" class="text-center">Estado</th>
+                                <th scope="col" class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="n : ${listaNotificaciones}">
+                                
+                                <td class="fw-bold text-secondary px-3" th:text="'#NT' + ${n.idNotificacion}"></td>
+                                
+                                <td class="fw-semibold text-dark" th:if="${rolUsuario == 'ADMINISTRADOR'}">
+                                    <span th:text="${n.usuario != null} ? ${n.usuario.correo} : 'Sistema / General'"></span>
+
+                                    <small class="text-muted d-block" th:if="${n.usuario != null}" th:text="'User ID: #' + ${n.usuario.idUsuario}"></small>
+                                </td>
+                                
+                                <td class="text-wrap" style="max-width: 550px;">
+                                    <strong class="d-block text-success" th:text="${n.titulo}"></strong>
+                                    <span class="small text-secondary" th:text="${n.descripcion}"></span>
+                                    <small class="text-muted d-block mt-1" th:text="${#temporals.format(n.fechaNotificacion, 'dd/MM/yyyy hh:mm a')}"></small>
+                                </td>
+                                
+                                <td class="text-center">
+                                    <span th:if="${n.leida}" class="badge bg-success-subtle text-success border border-success px-3 py-1.5 rounded-pill fw-bold">LEÍDA</span>
+                                    <span th:unless="${n.leida}" class="badge bg-warning-subtle text-warning border border-warning px-3 py-1.5 rounded-pill fw-bold">NUEVA</span>
+                                </td>
+
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm">
+                                        <a th:unless="${n.leida}" th:href="@{/leerNotificacion/{id}(id=${n.idNotificacion})}" class="btn btn-outline-success" title="Marcar como leída">
+                                            ✓ Leer
+                                        </a>
+                                        <a th:href="@{/eliminarNotificacion/{id}(id=${n.idNotificacion})}" class="btn btn-outline-danger" title="Ocultar o Eliminar">
+                                            ✕ Eliminar
+                                        </a>
+                                    </div>
+                                </td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <hr class="mt-5">
+                
+                <div class="text-center">
+                    <a href="/panel" class="btn btn-outline-secondary px-4 fw-bold">
+                        ← Volver al Panel
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
